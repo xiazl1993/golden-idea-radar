@@ -1,0 +1,34 @@
+name: Golden Idea Radar Scan
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 09:17 Asia/Shanghai
+    - cron: '17 1 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  github-scan:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.GIR_DATABASE_URL }}
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require persistent database
+        run: |
+          test -n "$DATABASE_URL" || (echo "Missing GIR_DATABASE_URL (Supabase/Postgres connection URL)" && exit 1)
+      - run: pip install -r requirements.txt
+      - name: Collect GitHub public signals and rank
+        run: |
+          python -m app.cli ingest-github --per-query 50
+          python -m app.cli run --report reports/latest.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: golden-idea-report
+          path: reports/latest.md
