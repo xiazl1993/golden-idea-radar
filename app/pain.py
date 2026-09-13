@@ -32,6 +32,10 @@ PAIN_PHRASES = {
     "feature request": 0.6,
     "would love": 0.6,
     "missing": 0.5,
+    "there is no way": 0.9,
+    "no built-in way": 0.8,
+    "wish there was": 0.7,
+    "no way to": 0.8,
 }
 
 COMMERCIAL_TERMS = ["多少钱", "价格", "收费", "订阅", "退款", "维修", "保养", "报价", "押金", "发票", "报销", "赔偿", "省钱"]
