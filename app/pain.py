@@ -29,6 +29,7 @@ PAIN_PHRASES = {
     "每次都要": 0.8,
     "希望增加": 0.7,
     "希望支持": 0.7,
+    "希望": 0.4,
     "feature request": 0.6,
     "would love": 0.6,
     "missing": 0.5,
@@ -41,7 +42,7 @@ PAIN_PHRASES = {
 COMMERCIAL_TERMS = ["多少钱", "价格", "收费", "订阅", "退款", "维修", "保养", "报价", "押金", "发票", "报销", "赔偿", "省钱"]
 INPUT_TERMS = ["截图", "照片", "图片", "账单", "报价单", "发票", "链接", "文档", "记录", "聊天"]
 MOAT_TERMS = ["历史", "持续", "监控", "记录", "库存", "订单", "工作流", "账户", "车型", "里程", "设备", "案例"]
-CN_STOP_PHRASES = {"有没有", "有没有办法", "怎么自动", "怎么批量", "为什么不能", "希望支持", "希望增加", "这个", "那个", "一个", "可以", "需要", "软件", "工具", "应用", "真的", "感觉", "每次"}
+CN_STOP_PHRASES = {"有没有", "有没有办法", "怎么自动", "怎么批量", "为什么不能", "希望支持", "希望增加", "希望", "这个", "那个", "一个", "可以", "需要", "软件", "工具", "应用", "真的", "感觉", "每次"}
 EN_STOP = {"the", "and", "for", "with", "this", "that", "from", "have", "would", "could", "please", "feature", "request"}
 
 
@@ -78,7 +79,8 @@ def extract_pain_signals(session: Session, include_demo: bool = False) -> int:
     changed = 0
     for obs in session.scalars(query).all():
         existing = session.scalar(select(PainSignal).where(PainSignal.observation_id == obs.id))
-        low = obs.text.lower()
+        combined = f"{obs.title or ''}\n{obs.text}"
+        low = combined.lower()
         matches = [p for p in PAIN_PHRASES if p.lower() in low]
         if not matches:
             if existing:
@@ -94,7 +96,7 @@ def extract_pain_signals(session: Session, include_demo: bool = False) -> int:
             tags.append("structured_input")
         if any(x in low for x in MOAT_TERMS):
             tags.append("workflow_or_history")
-        values = dict(normalized_text=normalize(obs.text), severity=severity, intent_score=intent, matched_phrases=matches, tags=tags)
+        values = dict(normalized_text=normalize(combined), severity=severity, intent_score=intent, matched_phrases=matches, tags=tags)
         if existing:
             for k, v in values.items():
                 setattr(existing, k, v)
