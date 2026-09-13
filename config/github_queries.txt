@@ -1,0 +1,7 @@
+# v0.1 starter queries: prefer concrete user pain / missing capability signals.
+"feature request" "manual" automation is:issue
+"there is no way" is:issue
+"wish there was" is:issue
+"cannot" "from the CLI" is:issue
+"希望支持" is:issue
+"有没有办法" 自动 is:issue
