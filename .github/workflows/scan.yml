@@ -16,10 +16,11 @@ jobs:
       DATABASE_URL: ${{ secrets.GIR_DATABASE_URL }}
       GITHUB_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+          cache: pip
       - name: Require persistent database
         run: |
           test -n "$DATABASE_URL" || (echo "Missing GIR_DATABASE_URL (Supabase/Postgres connection URL)" && exit 1)
